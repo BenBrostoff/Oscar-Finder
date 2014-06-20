@@ -32,24 +32,9 @@ class View
       print "".ljust(2) + "#{index + 1}".ljust(2)+"|#{nominee.name}".ljust(14)+"#{nominee.won}"
       puts
     }
-  end
-
-  def self.nominees_menu
-    clear_screen
 
     puts "--------------------------------------------------------------------------"
-    puts
-    puts "Which nominee (by number) would you like to get more information on?"
     puts "type <quit> to exit or <back> to go back to category."
-  end
-
-  def self.nominees_information
-    clear_screen
-
-    puts nominee.add_info
-    puts "--------------------------------------------------------------------------"
-    puts
-    puts "type <quit> to exit or <back> to go back to nominees"
   end
 
   def self.clear_screen
