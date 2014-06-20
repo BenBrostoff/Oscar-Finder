@@ -1,7 +1,7 @@
 class View
-  def self.get_input
-    gets.strip
-  end
+  # def self.get_input
+  #   gets.strip
+  # end
 
   def self.welcome
     puts "Welcome to the Oscars!!"
