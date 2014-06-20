@@ -1,7 +1,6 @@
 require 'rake'
 require 'rspec/core/rake_task'
 require_relative 'db/config'
-# require_relative 'lib/oscar_importer'
 
 
 desc "create the database"
@@ -25,8 +24,7 @@ end
 
 # desc "populate the test database with sample data"
 # task "db:populate" do
-#   StudentsImporter.import
-#   TeachersImporter.import
+#   require APP_ROOT.join('db', 'seeds.rb')
 # end
 
 desc "rollback your migration--use STEPS=number to step back multiple times"
