@@ -1,4 +1,5 @@
 require 'CSV'
+require '/db/config'
 
 # puts "TEST"
 
