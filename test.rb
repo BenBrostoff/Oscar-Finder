@@ -1,22 +1,35 @@
-#class Oscars < ActiveRecord::Base
-#	def initialize 
-#
-#
-#	end
-#
-#	def year
-#		Oscars.where(year: "#{user_input}")
-#
-#	
-#	end	
-#
-#end
+require_relative 'app/models/nominees.rb'
+require 'pry'
+class Oscars#  < ActiveRecord::Base
+
+  attr_accessor :model
+	def initialize
+    @model = Nominee.all
+	end
+
+	def get_categories(year)
+    hold = []
+		@model.where("year = ?", year).to_a.each { |x| hold << x[:category] }
+    hold.uniq
+	end
+
+end
+
+# Nominee.all.where("year = ?", 2010).where("nom_name = ?", "True Grit").to_a.each { |x| puts x[:nom_name] + " and " + x[:won] }
+ben = Oscars.new
+puts ben.get_categories(2010)
 
 class Controller
-	# attr_accessor :category_option, :year
+
+  attr_accessor :model
+
+  def initialize
+    @model = Oscars.new
+  end
+
 	def self.run
 		start
-		year_sequence 
+		year_sequence
 		category_sequence unless @year == 'quit'
 		nominee_sequence unless @category_option == 'quit'
 	end
@@ -27,21 +40,23 @@ class Controller
 
 	def self.year_sequence
 		View.get_year
-		@year = View.get_input
-		if !(1929..2010).to_a.include? @year.to_i
+		@year = View.get_input.to_i
+		if !(1929..2010).to_a.include? @year
 			View.wrong_year
 			year_sequence
 		end
 	end
 
-	def self.category_sequence	
-		View.category_menu
+	def self.category_sequence
+    binding.pry
+    x = @model.get_categories(@year)
+		View.category_menu(x)
 		@category_option = View.get_input
 		if @category_option == 'back'
-			year_sequence 
-		# elsif @category_option 
-		end	
-	end 
+			year_sequence
+		# elsif @category_option
+		end
+	end
 
 	def self.nominee_sequence
 		View.view_nominees(@category_option, @year)
@@ -50,9 +65,9 @@ class Controller
 			category_sequence
 		elsif @nominee_option == 'quit'
 			return
-		end	
+		end
 	end
-end 
+end
 
 
 class View
@@ -78,9 +93,8 @@ class View
     puts "or type <quit> to exit"
   end
 
-  def self.category_menu
-    #puts categories # CATEGORIES TABLE
-    puts
+  def self.category_menu(x)
+    puts x
     puts "--------------------------------------------------------------------------"
     puts
     puts "Which categorty (number) would you like to view?"
@@ -92,7 +106,7 @@ class View
 
     puts "".ljust(2) + "#".ljust(2)+"|Nominee".ljust(14) + "Won?"
     puts "--------------------------------------------------------------------------"
-    nominees.each_with_index{|nominee, index|
+    nominee.each_with_index{|nominee, index|
       print "".ljust(2) + "#{index + 1}".ljust(2)+"|#{nominee.name}".ljust(14)+"#{nominee.won}"
       puts
     }
@@ -107,4 +121,5 @@ class View
 
 end
 
-Controller.run
+x = Controller.new
+x.run
