@@ -1,6 +1,6 @@
 require_relative 'app/models/nominees.rb'
 require 'pry'
-class Oscars#  < ActiveRecord::Base
+class Oscars
 
   attr_accessor :model
 
@@ -38,7 +38,7 @@ end
 
 class Controller
 
-  attr_accessor :noms, :year
+  attr_accessor :noms, :year, :category_option
 
   def initialize
     @noms = Oscars.new
@@ -98,6 +98,11 @@ end
 
 
 class View
+
+  def self.star
+    puts "*" * 50
+  end
+
   def self.get_input
     gets.strip
   end
@@ -108,8 +113,10 @@ class View
   end
 
   def self.welcome
-    puts "Welcome to the Oscars!!"
-    puts "Where you can view all of the categories, nominees, and winners every year!"
+    system('clear')
+    puts "Welcome to the Oscar Finder"
+    View.star
+    puts "Wondering who won what in what year? Look no further!"
   end
 
   def self.get_year
