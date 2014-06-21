@@ -3,6 +3,7 @@ require 'pry'
 class Oscars#  < ActiveRecord::Base
 
   attr_accessor :model
+
 	def initialize
     @model = Nominee.all
 	end
@@ -13,32 +14,50 @@ class Oscars#  < ActiveRecord::Base
     hold.uniq
 	end
 
-end
+  def get_nominees(year, category)
+    noms = @model.where("year = ?", year).where("category = ?", category)
+  end
 
-# Nominee.all.where("year = ?", 2010).where("nom_name = ?", "True Grit").to_a.each { |x| puts x[:nom_name] + " and " + x[:won] }
-ben = Oscars.new
-puts ben.get_categories(2010)
+  def nom_array(year, category)
+    hold = []
+    self.get_nominees(year, category).to_a.each { |x| hold << x[:nom_name] }
+    hold
+  end
+
+  def winner(year, category, won = "YES")
+    winner = get_nominees(year, category).where("won = ?", "YES")
+  end
+
+  def winner_array(year, category)
+    hold = []
+    self.winner(year, category).to_a.each { |x| hold << x[:nom_name] }
+    hold
+  end
+
+end
 
 class Controller
 
-  attr_accessor :model
+  attr_accessor :noms, :year
 
   def initialize
-    @model = Oscars.new
+    @noms = Oscars.new
+    @year = 0
+    @category_option = ""
   end
 
-	def self.run
+	def run
 		start
 		year_sequence
 		category_sequence unless @year == 'quit'
 		nominee_sequence unless @category_option == 'quit'
 	end
 
-	def self.start
+	def start
 		View.welcome
 	end
 
-	def self.year_sequence
+	def year_sequence
 		View.get_year
 		@year = View.get_input.to_i
 		if !(1929..2010).to_a.include? @year
@@ -47,26 +66,34 @@ class Controller
 		end
 	end
 
-	def self.category_sequence
-    binding.pry
-    x = @model.get_categories(@year)
+	def category_sequence
+    x = @noms.get_categories(@year)
+    #binding.pry
 		View.category_menu(x)
 		@category_option = View.get_input
 		if @category_option == 'back'
 			year_sequence
-		# elsif @category_option
+		else
+      nominee_sequence
 		end
 	end
 
-	def self.nominee_sequence
-		View.view_nominees(@category_option, @year)
+	def nominee_sequence
+    x = noms.nom_array(@year, @category_option)
+		View.view_nominees(x)
 		@nominee_option = View.get_input
 		if @nominee_option == 'back'
 			category_sequence
-		elsif @nominee_option == 'quit'
-			return
+		else
+      winner_sequence
 		end
 	end
+
+  def winner_sequence
+    x = noms.winner_array(@year, @category_option)
+    View.view_winner(x)
+  end
+
 end
 
 
@@ -97,22 +124,29 @@ class View
     puts x
     puts "--------------------------------------------------------------------------"
     puts
-    puts "Which categorty (number) would you like to view?"
+    puts "Which category would you like to view?"
     puts "type <quit> to exit or <back> to go back to year."
   end
 
-  def self.view_nominees(category, year)
+  def self.view_nominees(x)
     clear_screen
+    puts "The nominees are as follows: "
+    puts x
 
-    puts "".ljust(2) + "#".ljust(2)+"|Nominee".ljust(14) + "Won?"
-    puts "--------------------------------------------------------------------------"
-    nominee.each_with_index{|nominee, index|
-      print "".ljust(2) + "#{index + 1}".ljust(2)+"|#{nominee.name}".ljust(14)+"#{nominee.won}"
-      puts
-    }
+    # puts "".ljust(2) + "#".ljust(2)+"|Nominee".ljust(14) + "Won?"
+    # puts "--------------------------------------------------------------------------"
+    # nominee.each_with_index{|nominee, index|
+    #   print "".ljust(2) + "#{index + 1}".ljust(2)+"|#{nominee.name}".ljust(14)+"#{nominee.won}"
+    #   puts
+    # }
 
     puts "--------------------------------------------------------------------------"
     puts "type <quit> to exit or <back> to go back to category."
+  end
+
+  def self.view_winner(x)
+    puts "And the winner is... "
+    puts x 
   end
 
   def self.clear_screen
@@ -122,4 +156,5 @@ class View
 end
 
 x = Controller.new
+# binding.pry
 x.run
